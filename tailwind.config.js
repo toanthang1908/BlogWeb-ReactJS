@@ -1,3 +1,5 @@
+const { DEFAULT_RUNTIME_WEBPACK } = require('next/dist/shared/lib/constants');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,11 +8,26 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    screens: {
+      sm: "480px",
+      md: "768px",
+      lg: "1024px"
+    },
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        primaryColor: "#f7aa1d",
+        primaryColorLight: "#1e3133",
+        secondaryColor: "#121d1e",
+        paragraphColor: "#888",
+        whiteColor: "#d3d3d3",
       },
+    },
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem"
+      }
     },
   },
   plugins: [],
