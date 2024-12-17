@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import TextArea from "@/components/TextArea";
 import demoimage from "@/public/img/demo_image.jpg";
 import Image from 'next/image'
+import  {deletePhoto} from "@/actions/uploadActions";
 
 const initialState = {
   title: "",
@@ -15,10 +16,12 @@ const initialState = {
   excerpt: "",
   quote: "",
   category: "Education",
-  photo: "",
+  photo: {},
+  blogId: "",
+  newImage: "",
 };
 
-const CreateBlog = () => {
+const EditBlog = ({params}) => {
 
   const CLOUD_NAME="dn6dk04pp";
   const UPLOAD_PRESET="nextjs_blog_images";
@@ -27,9 +30,39 @@ const CreateBlog = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+console.log(state)
   const router = useRouter();
   const {data: session, status} = useSession();
+
+  useEffect(() => {
+    async function fetchBlog() {
+      try {
+        const res = await fetch(`http://localhost:3000/api/blog/${params.id}`);
+
+        if (res.status === 200) {
+          const blogData = await res.json();
+
+          setState((prevstate) => ({
+            ...prevstate,
+            title: blogData.title,
+            description: blogData.description,
+            excerpt: blogData.excerpt,
+            quote: blogData.quote,
+            category: blogData.category,
+            photo: blogData.image,
+            blogId: blogData._id,
+          }));
+        } else {
+          setError("Lỗi khi tìm nạp dữ liệu blog");
+        }
+      } catch (error) {
+        setError("Lỗi khi tìm nạp dữ liệu blog");
+      }
+    }
+
+    fetchBlog();
+
+  }, [params.id]);
 
 
   if(status === "loading") {
@@ -40,30 +73,30 @@ const CreateBlog = () => {
     return <p>Quyền truy cập bị từ chối</p>
   }
 
-  const handleChange = (event) => {
-    setError("")
-    const {name, value, type, files} = event.target;
+  const handleChange = (event) =>  {
+    setError("");
+    const { name, value, type, files } = event.target;
 
-    if(type === 'file') {
-      setState({...state, [name]: files[0]});
+    if (type === "file") {
+      setState({ ...state, [name]: files[0] });
     } else {
-      setState({...state, [name]: value})
+      setState({ ...state, [name]: value });
     }
   };
-  console.log(session)
+
     const handleSubmit = async(e) => {
         e.preventDefault();
 
-        const {photo, title, category, description, excerpt, quote} = state;
+        const {newImage, title, category, description, excerpt, quote} = state;
 
         if(!title || !description || !category || !excerpt || !quote) {
         setError("Vui lòng điền vào tất cả các trường hợp.");
         return;
     }
 
-    if(photo) {
+    if(newImage) {
       const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-      if(photo.size > maxSize) {
+      if(newImage.size > maxSize) {
         setError('Dung lượng file quá lớn. Hãy chọn file dưới 5MB.');
         return;
       }
@@ -91,76 +124,95 @@ const CreateBlog = () => {
     
     try{
       setIsLoading(true);
-      setError("")
-      setSuccess("")
-      const image = await uploadImage();
+      setError("");
+      setSuccess("");
 
-      const newBlog = {
+    let image;
+
+    if(state.newImage) {
+        image = await uploadImage();
+
+        if(state.photo?.id) {
+            await deletePhoto(state.photo.id)
+
+        }
+    } else {
+        image= state.photo;
+    }
+
+      const updateBlog = {
         title,
         description,
         excerpt,
         quote,
         category,
         image,
-        authorId: session?.user?._id
+        authorId: session?.user?._id,
       }
 
-      const response = await fetch("http://localhost:3000/api/blog", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.user?.accessToken}`
-        },
-        method: "POST",
-        body: JSON.stringify(newBlog)
-      })
+      const response = await fetch(`http://localhost:3000/api/blog/${params.id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.user?.accessToken}`,
+          },
+          method: "PUT",
+          body: JSON.stringify(updateBlog),
+        }
+      )
 
-      if(response?.status === 201) {
-        setSuccess("Blog đã tạo thành công.");
+      if(response?.status === 200) {
+        setSuccess("Blog đã cập nhật thành công.");
         setTimeout(() => {
           router.refresh();
-          router.push("/blog")
+          router.push(`/blog/${params.id}`);
         }, 1500); 
       } else {
-        setError("Đã xảy ra lỗi khi tạo blog.")
+        setError("Đã xảy ra lỗi khi cập nhật blog.")
       }
     } catch(error) {
       console.log(error);
-      setError("Đã xảy ra lỗi khi tạo blog.")
+      setError("Đã xảy ra lỗi khi cập nhật blog.")
     }
 
     setIsLoading(false)
   }
 
   const uploadImage = async () => {
-    if(!state.photo) return;
+    if (!state.newImage) return;
 
     const formdata = new FormData();
 
-    formdata.append('file', state.photo);
+    formdata.append("file", state.newImage);
     formdata.append("upload_preset", UPLOAD_PRESET);
 
-    try{
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-        method: "POST",
-        body: formdata
-      });
-
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formdata,
+        }
+      );
       const data = await res.json();
       const image = {
         id: data["public_id"],
-        url: data['secure_url']
-      }
+        url: data["secure_url"],
+      };
 
       return image;
-    } catch(error) {
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
+  }
+
+  const handleCancleUploadImg = () => {
+    setState({ ...state, ["newImage"]: "" });
   }
 
   return (
     <section className="container max-w-3xl">
       <h2 className="mb-5">
-        <span className="special-word">Create</span> Blog
+        <span className="special-word">Edit</span> Blog
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -217,16 +269,16 @@ const CreateBlog = () => {
         </div>
 
         <div>
-          <label className="block mb-2 text-sm font-medium">
-            Upload hình ảnh
-          </label>
+          <label className="block mb-2 text-sm font-medium">Upload hình ảnh</label>
 
-          <input onChange={handleChange} type="file" name="photo" accept="image/*" />
+          <input
+            onChange={handleChange} type="file" name="newImage" accept="image/*"
+          />
 
-          {state.photo && (
+          {state.newImage ? (
             <div>
-              <Image 
-                src={URL.createObjectURL(state.photo)}
+              <Image
+                src={URL.createObjectURL(state.newImage)}
                 priority
                 alt="Sample image"
                 width={0}
@@ -234,10 +286,27 @@ const CreateBlog = () => {
                 sizes="100vw"
                 className="w-32 mt-5"
               />
+
+              <button onClick={handleCancleUploadImg}>Cancle</button>
+            </div>
+          ) : (
+
+            <div>
+              {state.photo && state.photo["url"] && (
+                <div>
+                  <Image
+                    src={state.photo.url}
+                    priority
+                    alt="Sample image"
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="w-32 mt-5"
+                  />
+                </div>
+              )}
             </div>
           )}
-
-          
         </div>
 
         {error && <div className="text-red-700">{error}</div>}
@@ -245,11 +314,11 @@ const CreateBlog = () => {
         {success && <div className="text-green-700">{success}</div>}
 
         <button type="submit" className="btn">
-          {isLoading ? "Đang tải..." : "Tạo"}
+          {isLoading ? "Đang tải..." : "Edit"}
         </button>
       </form>
     </section>
   );
 };
 
-export default CreateBlog;
+export default EditBlog;
