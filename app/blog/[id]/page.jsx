@@ -19,6 +19,7 @@ import {
   import cyberpunk_city from "@/public/img/cyberpunk_city.jpg"
   import Input from "@/components/Input";
   import { deletePhoto } from "@/actions/uploadActions";
+import { comment } from "postcss";
 
 function splitParagraph(paragraph) {
     const MIN_LENGTH = 280;
@@ -52,6 +53,15 @@ function splitParagraph(paragraph) {
 
     const [blogDetails, setBlogDetails] = useState({});
     const [IsDeleting, setIsDeleting] = useState(false);
+    const [isLiked, setIsLiked ] = useState(false);
+    const [blogLikes, setBlogLikes] = useState(0);
+
+    const [commentText, setCommentText] = useState("");
+    const [isCommenting, setIsCommenting] = useState(false);
+    const [blogComments, setBlogComments] = useState(0);
+
+    const [error, setError] = useState("")
+    const [success, setSuccess] = useState("")
 
     const router = useRouter();
     const {data: session, status} = useSession();
@@ -61,6 +71,9 @@ function splitParagraph(paragraph) {
             const response = await fetch(`http://localhost:3000/api/blog/${params.id}`);
             const blog = await response.json();
             setBlogDetails(blog);
+            setIsLiked(blog?.likes?.includes(session?.user?._id));
+            setBlogLikes(blog?.likes?.length || 0);
+            setBlogComments(blog?.comments?.length || 0);
         } catch(error) {
             console.log(error)
         }
@@ -105,6 +118,96 @@ function splitParagraph(paragraph) {
         }
       };
 
+    const handleLike = async () => {
+        if (!session?.user) {
+            alert("Đăng nhập trước khi thích bài viết.");
+            return;
+        }
+
+        try{
+            const response = await fetch(`http://localhost:3000/api/blog/${params.id}/like`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${session?.user?.accessToken}`,
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(null)
+            })
+
+            if(response.status === 200) {
+                setIsLiked(prev => ! prev);
+                setBlogLikes(prev => (isLiked ? prev -1 : prev + 1));
+            } else {
+                console.log("Yêu cầu không thành công với trạng thái:", response.status)
+            }
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
+    const handleCommentSubmit = async(e) => {
+        e.preventDefault();
+
+        if(!commentText) {
+        setError("Văn bản nhận xét là bắt buộc");
+        return;
+    }
+    
+    try{
+      setIsCommenting(true);
+      setError("")
+
+      const  newComment = {
+        text: commentText
+      }
+
+      const response = await fetch(`http://localhost:3000/api/blog/${params.id}/comment`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.user?.accessToken}`
+        },
+        method: "POST",
+        body: JSON.stringify(newComment)
+      })
+
+      if(response?.status === 201) {
+        setSuccess("Comment đã tạo thành công.");
+        setTimeout(() => {
+            setCommentText("");
+            fetchBlog();
+        }, 500); 
+      } else {
+        setError("Đã xảy ra lỗi khi tạo comment.")
+      }
+    } catch(error) {
+      console.log(error);
+      setError("Đã xảy ra lỗi khi tạo comment.")
+    }
+
+    setIsCommenting(false)
+  };
+
+  const handleDeleteComment = async(commentId) => {
+    try{
+        const response = await fetch(`http://localhost:3000/api/blog/${params.id}/comment/${commentId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.user?.accessToken}`
+          },
+          method: "DELETE",
+        })
+  
+        if(response?.status === 200) {
+            fetchBlog();
+        } else {
+            console.log("Yêu cầu không thành công với trạng thái: ", response.status)
+        }
+      } catch(error) {
+        console.log(error);
+        setError("Đã xảy ra lỗi khi tạo comment.")
+      }
+  }
+
     return (
         <section className="container max-w-3xl">
             {blogDetails?.authorId?._id.toString() === session?.user?._id.toString() && (
@@ -113,9 +216,10 @@ function splitParagraph(paragraph) {
                     <BsFillPencilFill />
                     Edit
                 </Link>
+
                 <button onClick={() => handleBlogDelete(blogDetails?.image?.id)} className="flex items-center gap-1 text-red-500">
                     <BsTrash />
-                    Delete
+                    {IsDeleting ? "Deleting..." : "Delete"}
                 </button>
             </div>
             )}
@@ -195,40 +299,78 @@ function splitParagraph(paragraph) {
             <div className="py-12">
                 <div className="flex gap-10 items-center text-xl justify-center">
                     <div className="flex items-center gap-1">
-                        <p>12</p>
+                        <p>{blogLikes}</p>
 
-                        <AiFillHeart size={20} color="#ed5784" cursor="pointer" />
+                        {
+                            isLiked ? (
+                                <AiFillHeart onClick={handleLike} size={20} color="#ed5784" cursor="pointer" />
+                            ) : (
+                                <AiOutlineHeart onClick={handleLike} size={20} cursor="pointer" />
+                            )
+                        }
                     </div>
+
+                    <div className="flex items-center gap-1">
+                        <p>{blogComments}</p>
+                        <AiOutlineComment size={20}/>
+                    </div>
+
                 </div>
             </div>
 
             <div>
-                <h3 className="text-red-500">Vui lòng đăng nhập để để lại commnet</h3>
+                {!session?.user && (
+                        <h3 className="text-red-500">Vui lòng đăng nhập để được bình luận</h3>
+                )}
 
-                <form action="" className="space-y-2">
-                    <Input name="comment" type="text" placeholder="Nhập lời nhắn..."/>
+                {
+                    session?.user && (
+                    <form onSubmit={handleCommentSubmit} className="space-y-2">
+                    <Input 
+                        onChange={(e) => setCommentText(e.target.value)}
+                        name="comment" 
+                        type="text" 
+                        placeholder="Nhập lời nhắn..."/>
 
                     <button type="submit" className="btn">
-                        Commnet
+                        {isCommenting ? "Loading..." : "Comment"}
                     </button>
                 </form>
+                )}
 
-                <div className="flex gap-3 py-5 items-center">
-                    <Image 
-                        src={cvAoTrang}
-                        alt="avatar image"
-                        width={0}
-                        height={0}
-                        sizes="100vw"
-                        className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                        <p className="text-whiteColor">Thang</p>
-                        <p>đây là cmt đầu tiên</p>
-                    </div>
+                {blogDetails?.comments && blogDetails?.comments.length === 0 && (
+                    <p>Không có bình luận</p>
+                )}
 
-                    <BsTrash cursor="pointer" className="text-red-500 ml-10"/>
-                </div>
+                {blogDetails?.comments && blogDetails?.comments.length > 0 && (
+                    <>
+                        {blogDetails.comments.map(comment => (
+                            <div key={comment._id} className="flex gap-3 py-5 items-center">
+                                <Image 
+                                    src={comment?.user?.avatar?.url ? comment?.user?.
+                                    avatar?.url : cvAoTrang}
+                                    alt="avatar image"
+                                    width={0}
+                                    height={0}
+                                    sizes="100vw"
+                                    className="w-10 h-10 rounded-full"
+                                />
+                                <div>
+                                    <p className="text-whiteColor">{comment?.user?.name}</p>
+                                    <p>{comment.text}</p>
+                                </div>
+
+                                {session?.user?._id === comment?.user?._id && (
+                                    <BsTrash onClick={() => handleDeleteComment(comment._id)} cursor="pointer" className="text-red-500 ml-10"/>
+                                )}
+
+                                
+                            </div>
+                        ))}
+                    </>
+                )}  
+
+
             </div>
 
         </section>
