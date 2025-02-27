@@ -29,7 +29,7 @@ export async function DELETE(req, res) {
 
       if(!comment) {
         return NextResponse.json(
-            { mes: "Comment does not exist" },
+            { mes: "Bình luận không tồn tại" },
             {status: 404}
         )
       }
