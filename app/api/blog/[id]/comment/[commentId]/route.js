@@ -36,7 +36,7 @@ export async function DELETE(req, res) {
   
       if (comment?.user?._id.toString() !== decodedToken._id.toString()) {
         return NextResponse.json(
-          { msg: "Chỉ tác giả mới xoá được bình luận" },
+          { msg: "Chỉ tác giả mới xoá được bình luận." },
           { status: 403 }
         );
       }
