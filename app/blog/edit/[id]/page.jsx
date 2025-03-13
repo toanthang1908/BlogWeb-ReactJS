@@ -272,7 +272,10 @@ console.log(state)
           <label className="block mb-2 text-sm font-medium">Upload hình ảnh</label>
 
           <input
-            onChange={handleChange} type="file" name="newImage" accept="image/*"
+            onChange={handleChange} 
+            type="file" 
+            name="newImage" 
+            accept="image/*"
           />
 
           {state.newImage ? (

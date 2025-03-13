@@ -1,23 +1,35 @@
 "use client"
 
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import Link from "next/link";
 import Image from "next/image";
-import thang from "@/public/img/thang.jpg";
+import demo_image from "@/public/img/demo_image.jpg";
 import {AiOutlineClose} from "react-icons/ai";
 import { usePathname } from "next/navigation";
 import {signOut, useSession} from "next-auth/react";
 
 const Navbar = () => {
-
+    const [userData, setUserData] = useState({});
     const {data: session, status} =useSession();
 
     const pathname = usePathname();
 
     const [showDropdown, setShowDropdown] = useState(false) 
 
-    const loggedIn = false;
+    async function fetchUser(){
+        try{
+            const res = await fetch(`http://localhost:3000/api/user/${session?.user?.id}`)
+            const resData = await res.json();
 
+            setUserData(resData)
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchUser();
+    },[session?.user?.id])
     const handleShowDropdown = () => setShowDropdown(prev => true)
     const handleHideDropdown = () => setShowDropdown(prev => false)
 
@@ -44,8 +56,11 @@ const Navbar = () => {
                                 <div className="relative">
                                     <Image 
                                         onClick={handleShowDropdown}
-                                        src={thang}
+                                        src={userData?.avatar?.url ?
+                                        userData?.avatar?.url : demo_image}
                                         alt="avatar"
+                                        width={0}
+                                        height={0}
                                         sizes="100vw"
                                         className="w-10 h-10 rounded-full cursor-pointer"
                                     /> 

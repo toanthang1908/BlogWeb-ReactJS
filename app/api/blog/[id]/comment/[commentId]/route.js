@@ -47,6 +47,6 @@ export async function DELETE(req, res) {
   
       return NextResponse.json({msg: "Thành công xoá bình luận"}, { status: 200 });
     } catch (error) {
-      return NextResponse.json({ message: "Delete error" }, {status: 500});
+      return NextResponse.json({ message: "Xóa lỗi" }, {status: 500});
     }
   }
