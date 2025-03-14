@@ -48,7 +48,7 @@ const FirstBlog = ({ firstBlog }) => {
                     ? firstBlog?.authorId?.avatar?.url
                     : kakashi
                 }
-                alt="hình ảnh cảu tác giả"
+                alt="hình ảnh của tác giả"
                 width={0}
                 height={0}
                 sizes="100vw"

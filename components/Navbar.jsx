@@ -37,7 +37,7 @@ const Navbar = () => {
         <div className="container py-2 h-16 flex items-center justify-between">
             <Link href="/">
                 <h2>
-                    Thang<span className="special-word">CaChep'</span>
+                    Blog<span className="special-word">Vip</span>
                 </h2>
             </Link>
 
@@ -50,7 +50,7 @@ const Navbar = () => {
                     session?.user ? (
                         <>
                             <li>
-                                <Link href="/create-blog" className={ pathname === "/create-blog" ? "text-primaryColor font-bold" : ""}>Create</Link>
+                                <Link href="/create-blog" className={ pathname === "/create-blog" ? "text-primaryColor font-bold" : ""}>Tạo bài viết</Link>
                             </li>
                             <li>
                                 <div className="relative">
@@ -68,8 +68,8 @@ const Navbar = () => {
                                     {showDropdown && (
                                         <div className='absolute top-0 right-0 bg-primaryColorLight p-5'>
                                         <AiOutlineClose onClick={handleHideDropdown} className='w-full cursor-pointer' />
-                                        <button onClick={() => {signOut(); handleHideDropdown();}}>Logout</button>
-                                        <Link onClick={handleHideDropdown} href={`/user/${session?.user?._id.toString()}`}>Profile</Link>
+                                        <button onClick={() => {signOut(); handleHideDropdown();}}>Đăng xuất</button>
+                                        <Link onClick={handleHideDropdown} href={`/user/${session?.user?._id.toString()}`}>Hồ sơ</Link>
                                     </div>
                                     )}
                                 </div>
@@ -78,10 +78,10 @@ const Navbar = () => {
                     ) : (
                         <>
                             <li>
-                                <Link href="/login" className={ pathname === "/login" ? "text-primaryColor font-bold" : ""}>Log In</Link>
+                                <Link href="/login" className={ pathname === "/login" ? "text-primaryColor font-bold" : ""}>Đăng nhập</Link>
                             </li>
                             <li>
-                                <Link href="/signup" className={ pathname === "/signup" ? "text-primaryColor font-bold" : ""}>Sign Up</Link>
+                                <Link href="/signup" className={ pathname === "/signup" ? "text-primaryColor font-bold" : ""}>Đăng ký</Link>
                             </li>
                         </>
                     )

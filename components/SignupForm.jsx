@@ -87,7 +87,7 @@ const SignupForm = () => {
     return (
         <section className="container">
             <form onSubmit={handleSubmit} className="border-2 border-paragraphColor rounded-lg max-w-sm mx-auto px-8 py-6 space-y-5">
-                <h2 className="text-center special-word">Sign up</h2>
+                <h2 className="text-center special-word">Đăng kí</h2>
 
                 <Input
                     label="Name"
@@ -120,12 +120,12 @@ const SignupForm = () => {
                 }
 
                 <button type="submit" className="btn w-full">
-                    {isLoading ? "Loading" : "Sign Up"}
+                    {isLoading ? "Loading" : "Đăng ký"}
                 </button>
 
                 <p className="text-center">
-                    Already a user? {" "}
-                    <Link href={"/login"} className="text-primaryColor">Loign</Link>
+                    Đã là người dùng? {" "}
+                    <Link href={"/login"} className="text-primaryColor">Đăng nhập</Link>
                 </p>
             </form>
         </section>
