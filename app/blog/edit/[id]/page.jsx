@@ -260,11 +260,11 @@ console.log(state)
             value={state.category}
             className="block rounded-lg w-full p-3 bg-primaryColorLight"
           >
-            <option value="Technology">Technology</option>
-            <option value="Education">Education</option>
-            <option value="Lifestyle">Lifestyle</option>
-            <option value="Politics">Politics</option>
-            <option value="Sports">Sports</option>
+            <option value="Technology">Công nghệ</option>
+            <option value="Education">Giáo dục</option>
+            <option value="Lifestyle">Lối sống</option>
+            <option value="Politics">Chính trị</option>
+            <option value="Sports">Thể thao</option>
           </select>
         </div>
 
@@ -317,7 +317,7 @@ console.log(state)
         {success && <div className="text-green-700">{success}</div>}
 
         <button type="submit" className="btn">
-          {isLoading ? "Đang tải..." : "Edit"}
+          {isLoading ? "Đang tải..." : "Chỉnh sửa"}
         </button>
       </form>
     </section>

@@ -85,7 +85,7 @@ function splitParagraph(paragraph) {
 
     const timeStr = blogDetails?.createdAt;
     const time = moment(timeStr);
-    const formattedTime = time.format("MMMM Do YYYY");
+    const formattedTime = time.format("DD-MM-YYYY");
 
     const handleBlogDelete = async (imageId) => {
         try {
@@ -181,7 +181,7 @@ function splitParagraph(paragraph) {
       }
     } catch(error) {
       console.log(error);
-      setError("Đã xảy ra lỗi khi tạo comment.")
+      setError("Đã xảy ra lỗi khi tạo bình luận.")
     }
 
     setIsCommenting(false)
@@ -204,7 +204,7 @@ function splitParagraph(paragraph) {
         }
       } catch(error) {
         console.log(error);
-        setError("Đã xảy ra lỗi khi tạo comment.")
+        setError("Đã xảy ra lỗi khi tạo bình luận.")
       }
   }
 
@@ -219,7 +219,7 @@ function splitParagraph(paragraph) {
 
                 <button onClick={() => handleBlogDelete(blogDetails?.image?.id)} className="flex items-center gap-1 text-red-500">
                     <BsTrash />
-                    {IsDeleting ? "Deleting..." : "Delete"}
+                    {IsDeleting ? "Đang xóa..." : "Xóa"}
                 </button>
             </div>
             )}

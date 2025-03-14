@@ -8,7 +8,7 @@ import moment from "moment";
 const FirstBlog = ({ firstBlog }) => {
   const timeStr = firstBlog?.createdAt;
   const time = moment(timeStr);
-  const formattedTime = time.format("MMMM Do YYYY");
+  const formattedTime = time.format("DD-MM-YYYY");
   return (
     <section>
       <Link href={`/blog/${firstBlog?._id}`}>

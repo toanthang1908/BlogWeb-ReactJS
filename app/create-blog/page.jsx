@@ -160,7 +160,7 @@ const CreateBlog = () => {
   return (
     <section className="container max-w-3xl">
       <h2 className="mb-5">
-        <span className="special-word">Create</span> Blog
+        <span className="special-word">Tạo</span> Blog
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">

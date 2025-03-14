@@ -13,7 +13,7 @@ export async function POST(req) {
         const isExisting = await User.findOne({email})
 
         if (isExisting) {
-            return NextResponse.json({ErrorMessage: "User already exists"})
+            return NextResponse.json({ErrorMessage: "Người dùng đã tồn tại"})
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)

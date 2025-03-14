@@ -19,13 +19,13 @@ export const authOptions = {
           const user = await User.findOne({ email });
 
           if (!user) {
-            throw new Error("Invalid input");
+            throw new Error("Nhập không hợp lệ");
           }
 
           const passwordMatch = await bcrypt.compare(password, user.password);
 
           if (!passwordMatch) {
-            throw new Error("Passwords do not match");
+            throw new Error("Mật khẩu không khớp");
           } else {
             const { password, ...currentUser } = user._doc;
             const accessToken = signJwtToken(currentUser, { expiresIn: "7d" });

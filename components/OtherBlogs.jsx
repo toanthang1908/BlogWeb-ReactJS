@@ -8,7 +8,7 @@ import moment from "moment";
 const OtherBlogs = ({ otherBlogs }) => {
   const timeStr = otherBlogs?.createdAt;
   const time = moment(timeStr);
-  const formattedTime = time.format("MMMM Do YYYY");
+  const formattedTime = time.format("DD-MM-YYYY");
 
   return (
     <section>

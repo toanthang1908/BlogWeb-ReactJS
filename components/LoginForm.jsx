@@ -87,14 +87,14 @@ const LoginForm = () => {
         <h2 className="text-center special-word">Login</h2>
 
         <Input
-          label="Email"
+          label="Tên"
           type="text"
           name="email"
           onChange={handleChange}
           value={state.email}
         />
         <Input
-          label="Password"
+          label="Mật khẩu"
           type="password"
           name="password"
           onChange={handleChange}
@@ -106,13 +106,13 @@ const LoginForm = () => {
         {success && <div className="text-green-700">{success}</div>}
 
         <button type="submit" className="btn w-full">
-            {isLoading ? "Loading..." : "Login"}
+            {isLoading ? "Đang tải..." : "Đăng nhập"}
         </button>
 
         <p className="text-center">
-          Need an account?{" "}
+          Bạn chưa có tài khoản?{" "}
           <Link href={"/signup"} className="text-primaryColor">
-            Sign Up
+            Đăng ký
           </Link>
         </p>
       </form>
