@@ -84,10 +84,10 @@ const LoginForm = () => {
         onSubmit={handleSubmit}
         className="border-2 border-paragraphColor rounded-lg max-w-sm mx-auto px-8 py-6 space-y-5"
       >
-        <h2 className="text-center special-word">Login</h2>
+        <h2 className="text-center special-word">Đăng nhập</h2>
 
         <Input
-          label="Tên"
+          label="Email"
           type="text"
           name="email"
           onChange={handleChange}

@@ -180,7 +180,7 @@ const ProfileDetail = ({profile, params}) => {
                         width={0} 
                         height={0} 
                         sizes="100vw" 
-                        className="w-40 h-40 rounded-full border-2 border-black"
+                        className="w-80 h-80 rounded-full border-2 border-black"
                     />
                 </div>
 

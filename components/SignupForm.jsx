@@ -90,7 +90,7 @@ const SignupForm = () => {
                 <h2 className="text-center special-word">Đăng kí</h2>
 
                 <Input
-                    label="Name"
+                    label="Tên"
                     type="text"
                     name="name"
                     onChange={handleChange}
@@ -104,7 +104,7 @@ const SignupForm = () => {
                     value={state.email}
                 />
                 <Input
-                    label="Password"
+                    label="Mật khẩu"
                     type="password"
                     name="password"
                     onChange={handleChange}
