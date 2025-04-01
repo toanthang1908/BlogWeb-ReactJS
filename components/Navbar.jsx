@@ -28,7 +28,7 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchUser();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, userData]);
 
   const handleShowDropdown = () => setShowDropdown(true);
   const handleHideDropdown = () => setShowDropdown(false);
@@ -44,9 +44,18 @@ const Navbar = () => {
       <ul className="flex items-center gap-3">
         <li>
           <Link href="/blog" className={pathname === "/blog" ? "text-primaryColor font-bold" : ""}>
-            Blog
+            Blogs
           </Link>
         </li>
+
+        {/* <li>
+          <Link
+            href= "/my-blog"
+            className={pathname === "/my-blog" ? "text-primaryColor font-bold" : ""}
+          >
+            Blog của tôi
+          </Link>
+        </li> */}
 
         {session?.user ? (
           <>
@@ -55,7 +64,7 @@ const Navbar = () => {
                 href="/create-blog"
                 className={pathname === "/create-blog" ? "text-primaryColor font-bold" : ""}
               >
-                Tạo bài viết
+                Tạo Blog
               </Link>
             </li>
             <li>

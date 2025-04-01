@@ -8,7 +8,7 @@ import moment from "moment";
 import Modal from "@/components/Model";
 import {deletePhoto} from "@/actions/uploadActions";
 import Input from "@/components/Input";
-import cvAoTrang from "@/public/img/cvAoTrang.jpg";
+import demo_image from "@/public/img/demo_image.jpg";
 import { AiOutlineClose } from "react-icons/ai";
 
 
@@ -43,7 +43,7 @@ const ProfileDetail = ({profile, params}) => {
     }
 
     if(avatarToEdit) {
-      const maxSize = 2 * 1024 * 1024; // 5MB in bytes
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if(avatarToEdit.size > maxSize) {
         setError('Dung lượng file quá lớn. Hãy chọn file dưới 2MB.');
         return;
@@ -175,7 +175,7 @@ const ProfileDetail = ({profile, params}) => {
                 
                 <div className="flex-1 flex items-center justify-center">
                     <Image 
-                        src={profile?.avatar?.url || cvAoTrang} 
+                        src={profile?.avatar?.url || demo_image} 
                         alt="avatar" 
                         width={0} 
                         height={0} 
@@ -211,6 +211,15 @@ const ProfileDetail = ({profile, params}) => {
                         <p>Thời gian lập tài khoản:</p>
                         <p>{timeFormat()}</p>
                     </div>
+
+                    <div className="space-y-1">
+                        <button 
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                            onClick={() => router.push("/change-password")}>
+                            Thay đổi mật khẩu
+                        </button>
+                    </div>
+
 
                 </div>
             </div>

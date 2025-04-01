@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { verifyJwtToken } from "@/lib/jwt";
 import Blog from "@/models/Blog";
 import User from "@/models/User";
+import { deleteManyPhotos } from "@/actions/uploadActions";
 
 export async function PATCH(req, res) {
   await connect();
@@ -17,7 +18,7 @@ export async function PATCH(req, res) {
 
   if (!accessToken || !decodedToken) {
     return NextResponse.json(
-      { error: "trái phép (mã thông báo sai hoặc hết hạn)" },
+      { error: "Truy cập bị từ chối (token không hợp lệ hoặc đã hết hạn" },
       { status: 403 }
     );
   }
@@ -28,20 +29,18 @@ export async function PATCH(req, res) {
 
     if (user?._id.toString() !== decodedToken._id.toString()) {
       return NextResponse.json(
-        { msg: "Chỉ tác giả mới có thể cập nhật thông tin của mình" },
+        { msg: "Chỉ tác giả mới có thể cập nhật dữ liệu của mình" },
         { status: 403 }
       );
     }
 
-    const updateUser = await User.findByIdAndUpdate(
-      user?._id,
-      body,
-      { new: true }
-    );
+    const updateUser = await User.findByIdAndUpdate(user?._id, body, {
+      new: true,
+    });
 
-    return NextResponse.json(updateBlog, { status: 200 });
+    return NextResponse.json(updateUser, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: "PATCH error" }, {status: 500});
+    return NextResponse.json({ message: "PATCH error" }, { status: 500 });
   }
 }
 
@@ -65,35 +64,61 @@ export async function GET(req, res) {
 }
 
 export async function DELETE(req, res) {
-    await connect();
-  
-    const id = res.params.id;
-    const accessToken = req.headers.get("authorization");
-    const token = accessToken.split(" ")[1];
-  
-    const decodedToken = verifyJwtToken(token);
-  
-    if (!accessToken || !decodedToken) {
+  await connect();
+
+  const id = res.params.id;
+  const accessToken = req.headers.get("authorization");
+  const token = accessToken.split(" ")[1];
+
+  const decodedToken = verifyJwtToken(token);
+
+  if (!accessToken || !decodedToken) {
+    return NextResponse.json(
+      { error: "Truy cập bị từ chối (token không hợp lệ hoặc đã hết hạn" },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const user = await User.findById(id).select("-password -__v");
+
+    if (user?._id.toString() !== decodedToken._id.toString()) {
       return NextResponse.json(
-        { error: "trái phép (mã thông báo sai hoặc hết hạn)" },
+        { msg: "Chỉ tác giả mới có thể xóa được dữ liệu của mình" },
         { status: 403 }
       );
     }
-  
-    try {
-      const blog = await Blog.findById(id).populate("authorId");
-  
-      if (blog?.authorId?._id.toString() !== decodedToken._id.toString()) {
-        return NextResponse.json(
-          { msg: "Chỉ tác giả mới có thể xóa blog của mình" },
-          { status: 403 }
-        );
-      }
-  
-      await Blog.findByIdAndDelete(id)
-  
-      return NextResponse.json({msg: "Xoá blog thành công"}, { status: 200 });
-    } catch (error) {
-      return NextResponse.json({ message: "Xóa lỗi" }, {status: 500});
-    }
+
+    const blogImages = await Blog.find({ authorId: id.toString() })
+      .select("image")
+      .exec();
+
+    const formattedBlogImages = blogImages.map((imageObj) => ({
+      id: imageObj.image.id,
+    }));
+
+    const userImages = await User.findById({ _id: id.toString() })
+      .select("avatar")
+      .exec();
+
+    const finalImageIds = [
+        ...formattedBlogImages,
+        {
+            id: userImages?.avatar?.id
+        }
+    ]
+
+    await Promise.all([
+      User.findOneAndRemove({ _id: decodedToken._id.toString() }),
+      Blog.deleteMany({ authorId: decodedToken._id.toString() }),
+      deleteManyPhotos(finalImageIds),
+    ]);
+
+    return NextResponse.json(
+      { msg: "Người dùng đã bị xóa" },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json({ message: "Xóa bị lỗi" }, { status: 500 });
   }
+}
