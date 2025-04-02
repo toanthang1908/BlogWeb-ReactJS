@@ -1,5 +1,5 @@
 import Image from "next/image";
-import blogvip from "@/public/img/blogvip.jpg";
+import logo from "@/public/img/logo.jpg";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
 
       <div className="basis-full md:basis-1/3">
         <Image 
-          src={blogvip}
+          src={logo}
           alt="BlogVip Logo"
           sizes="100vw"
           className="w-full h-auto max-w-xs md:max-w-full mx-auto md:mx-0"

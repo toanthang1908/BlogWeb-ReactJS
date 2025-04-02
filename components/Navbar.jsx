@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import demo_image from "@/public/img/demo_image.jpg";
+import person_icon from "@/public/img/person_icon.png";
 import { AiOutlineClose } from "react-icons/ai";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
@@ -71,7 +71,7 @@ const Navbar = () => {
               <div className="relative">
                 <Image
                   onClick={handleShowDropdown}
-                  src={userData?.avatar?.url ? userData?.avatar?.url : demo_image}
+                  src={userData?.avatar?.url ? userData?.avatar?.url : person_icon}
                   alt="avatar"
                   width={0}
                   height={0}
