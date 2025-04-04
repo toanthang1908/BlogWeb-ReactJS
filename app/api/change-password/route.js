@@ -41,7 +41,7 @@ export async function POST(req) {
 
     if (!user) {
       console.log("Step 5.1: User not found");
-      return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
+      return new Response(JSON.stringify({ message: "Không tìm thấy User" }), { status: 404 });
     }
 
     // Kiểm tra mật khẩu cũ
@@ -50,7 +50,7 @@ export async function POST(req) {
 
     if (!isMatch) {
       console.log("Step 6.1: Incorrect current password");
-      return new Response(JSON.stringify({ message: "Incorrect current password" }), { status: 400 });
+      return new Response(JSON.stringify({ message: "Mật khẩu hiện tại không chính xác" }), { status: 400 });
     }
 
     // Mã hóa mật khẩu mới
@@ -62,10 +62,10 @@ export async function POST(req) {
     await user.save();
     console.log("Step 8: Password updated successfully");
 
-    return new Response(JSON.stringify({ message: "Password updated successfully" }), { status: 200 });
+    return new Response(JSON.stringify({ message: "Thay đổi mật khẩu thành công" }), { status: 200 });
   } catch (error) {
     console.error("Error updating password:", error.message);
     console.error("Stack trace:", error.stack);
-    return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ message: "Lỗi máy chủ nội bộ", error: error.message }), { status: 500 });
   }
 }
