@@ -32,7 +32,7 @@ const ProfileDetail = ({ profile, params }) => {
 
   const [profileToEdit, setProfileToEdit] = useState(profile);
   const [avatarToEdit, setAvatarToEdit] = useState("");
-  const [openModalEdit, setOpenModalEdit] = useState(false);
+  const [openModalEdit, setOpenModalEdit] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
